@@ -1,0 +1,37 @@
+################
+## Mac
+
+.DS_Store
+
+################
+## Emacs
+
+*.elc
+*~
+.cask
+
+################
+## TeX
+
+*.aux
+*.dvi
+*.toc
+*.bak
+*.idx
+*.lnk
+*.lof
+*.lot
+*.synctex
+*.blg
+
+################
+## My Attics
+
+attic/
+
+################
+## Private settings
+
+settings.yml
+vendor/
+.bundle/
