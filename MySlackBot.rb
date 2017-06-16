@@ -17,8 +17,8 @@ class MySlackBot < SlackBot
   	message = params[:text].gsub("@Dbot",'')
   	array = message.split #convert(0) 25(1) thb(2) to(3) jpy(4)
   	num = array[1].to_f
-  	src = array[2]
-  	dest = array[4]
+  	src = array[2].upcase
+  	dest = array[4].upcase
 
   	data = Net::HTTP.get('www.google.com', "/finance/converter?a=#{num}&from=#{src}&to=#{dest}")
     user_name = params[:user_name] ? "@#{params[:user_name]}" : ""
@@ -26,7 +26,7 @@ class MySlackBot < SlackBot
       ans = $& 
       message = "#{user_name} #{num} #{src} = #{ans}"   
     else
-      message = "ERROR" 
+      message = "ERROR, please check your spelling." 
     end
     return {text: "#{message} \nsrc : www.google.com/finance/converter?a=#{num}&from=#{src}&to=#{dest}"}.merge(option).to_json 
   end
