@@ -31,6 +31,6 @@ class SlackBot
     return nil if params[:user_name] == "slackbot" || params[:user_id] == "USLACKBOT"
 
     user_name = params[:user_name] ? "@#{params[:user_name]}" : ""
-    return {text: "#{user_name} Hi! Try 'help' for instruction}.merge(options).to_json
+    return {text: "#{user_name} Hi! Try 'help' for instruction"}.merge(options).to_json
   end
 end
