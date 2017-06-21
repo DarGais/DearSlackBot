@@ -49,17 +49,17 @@ end
 post '/slack' do
   content_type :json
 
-  #unless config["slack_verification_token"] == params[:token]
-    #halt 403, "Invalid Slack verification token received: #{params[:token]}"
-  #end
-
-  if /say/ =~ params[:text]
-  	slackbot.delete_say(params, username: "Dbot")
-  elsif /convert/ =~ params[:text]
-  	slackbot.convert_currency(params, username: "Dbot")
-  elsif /help/ =~ params[:text]
-    slackbot.help(params, username: "Dbot")
+  if params[:token] == "jcXwOOzu4DRWGcIqoOhZf4iF"
+    if /say/ =~ params[:text]
+  	 slackbot.delete_say(params, username: "Dbot")
+    elsif /convert/ =~ params[:text]
+  	 slackbot.convert_currency(params, username: "Dbot")
+    elsif /help/ =~ params[:text]
+      slackbot.help(params, username: "Dbot")
+    else
+      slackbot.naive_respond(params, username: "Dbot")
+    end
   else
-    slackbot.naive_respond(params, username: "Dbot")
+    puts "ERROR, wrong token/don't have token."
   end
 end
