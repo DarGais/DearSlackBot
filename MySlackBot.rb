@@ -48,7 +48,12 @@ end
 
 post '/slack' do
   content_type :json
-  if /say/ =~ params[:text]#condition
+
+  unless config["slack_verification_token"] == params[:token]
+    halt 403, "Invalid Slack verification token received: #{params[:token]}"
+  end
+
+  if /say/ =~ params[:text]
   	slackbot.delete_say(params, username: "Dbot")
   elsif /convert/ =~ params[:text]
   	slackbot.convert_currency(params, username: "Dbot")
