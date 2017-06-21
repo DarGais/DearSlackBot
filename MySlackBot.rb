@@ -7,8 +7,8 @@ require 'net/http'
 class MySlackBot < SlackBot
   # cool code goes here
   def delete_say(params, option = {})
-  	message = params[:text].gsub("@Dbot say「",'')
-  	message = message.gsub("」",'')
+  	message = params[:text].gsub("@Dbot say [",'')
+  	message = message.gsub("]",'')
   	user_name = params[:user_name] ? "@#{params[:user_name]}" : ""
   	return {text: "#{user_name} #{message}"}.merge(option).to_json  	
   end
@@ -33,7 +33,7 @@ class MySlackBot < SlackBot
   #----------------------------------------------------------------
   def help(params, option = {})
     user_name = params[:user_name] ? "@#{params[:user_name]}" : ""
-    return {text:"#{user_name}\n1. type say「ooo」\n2. type convert <number> <currency ; JPY> to <currency ; USD>\n"}.merge(option).to_json 
+    return {text:"#{user_name}\n1. type say [ooo]\n2. type convert <number> <currency ; JPY> to <currency ; USD>\n"}.merge(option).to_json 
   end
   #---------------------------------------------------------------
 end
