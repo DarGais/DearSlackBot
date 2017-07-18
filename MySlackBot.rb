@@ -72,7 +72,10 @@ class MySlackBot < SlackBot
   #----------------------------------------------------------------
   def help(params, option = {})
     user_name = params[:user_name] ? "@#{params[:user_name]}" : ""
-    return {text:"#{user_name}\n1. type say [ooo]\n2. type convert <number> <currency ; JPY> to <currency ; USD>\n"}.merge(option).to_json
+    return {text:"#{user_name}\n
+    1. type \"say [ooo]\"\n
+    2. type \"convert <number> <currency ; JPY> to <currency ; USD>\"\n
+    3. type \"get room106 status\" or \"get room106 status @<time ; 9.00 or 9:00>\" \n"}.merge(option).to_json
   end
   #---------------------------------------------------------------
 end
@@ -95,7 +98,7 @@ post '/slack' do
   	 slackbot.convert_currency(params, username: "Dbot")
     elsif /help/ =~ params[:text]
       slackbot.help(params, username: "Dbot")
-    elsif /get room106/ =~ params[:text] || /get 106/ =~ params[:text]
+    elsif /get room106 status/ =~ params[:text] || /get 106 status/ =~ params[:text]
       slackbot.get_sensor_value(params, username: "Dbot")
     else
       slackbot.naive_respond(params, username: "Dbot")
