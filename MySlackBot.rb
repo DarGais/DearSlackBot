@@ -3,6 +3,8 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'sinatra'
 require 'SlackBot'
 require 'net/http'
+require 'json'
+require 'date'
 
 class MySlackBot < SlackBot
   # cool code goes here
@@ -10,7 +12,7 @@ class MySlackBot < SlackBot
   	message = params[:text].gsub("@Dbot say [",'')
   	message = message.gsub("]",'')
   	user_name = params[:user_name] ? "@#{params[:user_name]}" : ""
-  	return {text: "#{user_name} #{message}"}.merge(option).to_json  	
+  	return {text: "#{user_name} #{message}"}.merge(option).to_json
   end
   #---------------------------------------------------------------
   def convert_currency(params, option = {})
@@ -23,17 +25,54 @@ class MySlackBot < SlackBot
   	data = Net::HTTP.get('www.google.com', "/finance/converter?a=#{num}&from=#{src}&to=#{dest}")
     user_name = params[:user_name] ? "@#{params[:user_name]}" : ""
     if /[\d.]+\s+#{dest}/ =~ data
-      ans = $& 
-      message = "#{user_name} #{num} #{src} = #{ans}"   
+      ans = $&
+      message = "#{user_name} #{num} #{src} = #{ans}"
     else
-      message = "ERROR, please check your spelling." 
+      message = "ERROR, please check your spelling."
     end
-    return {text: "#{message} \nsrc : www.google.com/finance/converter?a=#{num}&from=#{src}&to=#{dest}"}.merge(option).to_json 
+    return {text: "#{message} \nsrc : www.google.com/finance/converter?a=#{num}&from=#{src}&to=#{dest}"}.merge(option).to_json
+  end
+  #----------------------------------------------------------------
+  def get_sensor_value(params, option = {})
+    user_name = params[:user_name] ? "@#{params[:user_name]}" : ""
+    message = params[:text]#@Dbot get room106 status
+    array = message.split  #  0   1    2        3
+    if array[4] == nil
+      t = "now"
+    else
+      t = array[4]
+    end
+
+    url = "https://eye-dear.herokuapp.com/channels/get_values?api_key=dear&time=#{t}"
+    uri = URI(url)
+    response = Net::HTTP.get(uri)
+    data = JSON.parse(response)
+
+    timestamp = DateTime.parse(data['timestamp'], '%Y-%m-%dT%H:%M:%S%z')
+
+    date = timestamp.day.to_s + "/" + timestamp.month.to_s + "/" + timestamp.year.to_s
+    if timestamp.minute < 10
+      time = timestamp.hour.to_s + ":" + "0" + timestamp.minute.to_s
+    else
+      time = timestamp.hour.to_s + ":" + timestamp.minute.to_s
+    end
+
+    temp = data['value1']
+    light = data['value2']
+    if data['value3'] == 1.0 || data['value3'] == 1
+      door = "lock"
+    else
+      door = "unlock"
+    end
+    message = "Date = #{date}\nTime = #{time}\nTemp. = #{temp} celcius\nLight = #{light}\nDoor status = #{door}\n"
+
+
+    return {text: "#{user_name} #{message}"}.merge(option).to_json
   end
   #----------------------------------------------------------------
   def help(params, option = {})
     user_name = params[:user_name] ? "@#{params[:user_name]}" : ""
-    return {text:"#{user_name}\n1. type say [ooo]\n2. type convert <number> <currency ; JPY> to <currency ; USD>\n"}.merge(option).to_json 
+    return {text:"#{user_name}\n1. type say [ooo]\n2. type convert <number> <currency ; JPY> to <currency ; USD>\n"}.merge(option).to_json
   end
   #---------------------------------------------------------------
 end
@@ -56,6 +95,8 @@ post '/slack' do
   	 slackbot.convert_currency(params, username: "Dbot")
     elsif /help/ =~ params[:text]
       slackbot.help(params, username: "Dbot")
+    elsif /get room106/ =~ params[:text] || /get 106/ =~ params[:text]
+      slackbot.get_sensor_value(params, username: "Dbot")
     else
       slackbot.naive_respond(params, username: "Dbot")
     end
