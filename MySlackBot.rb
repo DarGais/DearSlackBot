@@ -35,12 +35,12 @@ class MySlackBot < SlackBot
   #----------------------------------------------------------------
   def get_sensor_value(params, option = {})
     user_name = params[:user_name] ? "@#{params[:user_name]}" : ""
-    message = params[:text]#@Dbot get room106 status
-    array = message.split  #  0   1    2        3
+    message = params[:text].gsub("@",'')#Dbot get room106 status [time]
+    array = message.split                #  0   1    2        3
     if array[4] == nil
       t = "now"
     else
-      t = array[4]
+      t = array[4].gsub(".",':')
     end
 
     url = "https://eye-dear.herokuapp.com/channels/get_values?api_key=dear&time=#{t}"
